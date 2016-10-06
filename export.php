@@ -35,17 +35,32 @@ $apiKey = 'SsdqpVN7wNdAmj';
 $formatKey = 'csv'; // I should be able to change this to csv, xml, or json to adjust outputted format
 
 // Logic for gathering product data goes here
+
 // Connect to SOAP API using PHP's SoapClient class
 // Feel free to create your own classes to simplify multiple API calls
-$soap = new SoapClient($apiUrl);
+$client = new SoapClient($apiUrl);
+#var_dump($client->__getFunctions()); 
+#var_dump($client->__getTypes()); 
+$session = $client->login($apiUser, $apiKey);
+$result = $client->call($session, 'cataloginventory_stock_item.list', '1');
+//var_dump($result);
+#echo json_encode($result)
 // ...
 // ...
 
 // Output logic goes here, most will be encapsulated in your classes
 // View ProductOutput in raz-lib.php for help on what else goes here
-$factory = new FormatFactory(); // You will need to create this class. Be sure to use constants for the format keys!
-$format = $factory->create($formatKey);
-$output = new ProductOutput();
+#$factory = new FormatFactory(); // You will need to create this class. Be sure to use constants for the format keys!
+#$format = $factory->create($formatKey);
+#$output = new ProductOutput();
 // ...
 // ...
-$output->format();
+#$output->format();
+
+$client = new ProductOutput();
+//$client->setFormat(new JsonStringOutput());
+$client->setFormat(new XMLOutput());
+$client->setProducts($result);
+$client->format();
+
+?>
