@@ -32,7 +32,7 @@ require_once 'dev-lib.php';
 $apiUrl = 'http://www.wellpennedgreetings.com/api/?wsdl';
 $apiUser = 'dev-test';
 $apiKey = 'SsdqpVN7wNdAmj';
-$formatKey = 'csv'; // I should be able to change this to csv, xml, or json to adjust outputted format
+$formatKey = 'json'; // I should be able to change this to csv, xml, or json to adjust outputted format
 
 // Logic for gathering product data goes here
 
@@ -42,7 +42,36 @@ $client = new SoapClient($apiUrl);
 #var_dump($client->__getFunctions()); 
 #var_dump($client->__getTypes()); 
 $session = $client->login($apiUser, $apiKey);
-$result = $client->call($session, 'cataloginventory_stock_item.list', '1');
+//$list = array ('1','2','3');
+$result1 = $client->call($session, 'catalog_product.info', 1);
+$result2 = $client->call($session, 'catalog_product.info', 2);
+$result3 = $client->call($session, 'catalog_product.info', 3);
+
+
+//$results = array ($result1);
+
+function apiFilter(array $result) {
+	$temp = array();
+	foreach ($result as $key=>$value) {
+		if ("sku" == $key || "name" == $key || "price" == $key || "short_description" == $key) {
+			//echo $key ."<br>";
+			$temp[$key] = $value;
+		}
+	}
+return $temp;
+}
+
+ $result1 = apiFilter($result1);
+ $result2 = apiFilter($result2);
+ $result3 = apiFilter($result3);
+
+ //var_dump(result1);
+$results = array ($result1 ,$result2 ,$result3);
+
+//var_dump($results);
+$client->endSession($session);
+
+
 //var_dump($result);
 #echo json_encode($result)
 // ...
@@ -50,17 +79,20 @@ $result = $client->call($session, 'cataloginventory_stock_item.list', '1');
 
 // Output logic goes here, most will be encapsulated in your classes
 // View ProductOutput in raz-lib.php for help on what else goes here
-#$factory = new FormatFactory(); // You will need to create this class. Be sure to use constants for the format keys!
-#$format = $factory->create($formatKey);
-#$output = new ProductOutput();
+
+$factory = new FormatFactory(); // You will need to create this class. Be sure to use constants for the format keys!
+
+$format = $factory->create($formatKey);
+
+//$output = new ProductOutput();
 // ...
 // ...
-#$output->format();
+//$output->format();
 
 $client = new ProductOutput();
-//$client->setFormat(new JsonStringOutput());
-$client->setFormat(new XMLOutput());
-$client->setProducts($result);
+$client->setFormat($format);
+//$client->setFormat(new XMLOutput());
+$client->setProducts($results);
 $client->format();
 
 ?>

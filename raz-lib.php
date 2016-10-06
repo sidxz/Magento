@@ -1,12 +1,8 @@
 <?php
-
-/**
- * code goes here
- */
-
-/*
+require_once 'conversions.php';
+/*************************
 ** Strategy Design Pattern
-*/
+**************************/
 interface FormatInterface
 {
     public function start();
@@ -16,40 +12,42 @@ interface FormatInterface
     public function finish();
 }
 
+
+
 class JsonStringOutput implements FormatInterface
 {
     public function start() {
-        echo '<br><br>++JSON STRING OUTPUT START() <br>';
+        echo '[';
     }
 
     public function formatProduct(array $product) {
-        echo '<br><br>++JSON STRING OUTPUT FORMAT-PRODUCT() <br>';
-        echo json_encode($product);
+        //echo json_encode($product);
+        $conversion = new Conversions();
+        //echo "<br>";        
+        echo $conversion->toJSON($product);
     }
 
     public function finish() {
-        echo '<br><br>++JSON STRING OUTPUT FINISH() <br>';
-
-
+        echo ']';
     }
 }
 
 class XMLOutput implements FormatInterface
 {
     public function start() {
-        echo '<br><br>++XMLOutput OUTPUT START() <br>';
+        header("Content-type: text/xml; charset=utf-8");
+        echo "<XML>";
     }
 
     public function formatProduct(array $product) {
-        echo '<br><br>++JXMLOutput OUTPUT FORMAT-PRODUCT() <br>';
-        $xml = new SimpleXMLElement('<root/>');
-        array_walk_recursive($product, array ($xml, 'addChild'));
-        echo $xml->asXML();
+        //var_dump($product);
+        $conversion = new Conversions();
+        //echo "<br>";    
+        echo $conversion->toXML($product);
     }
 
     public function finish() {
-        echo '<br><br>++XMLOutput OUTPUT FINISH() <br>';
-
+        echo "</XML>";
 
     }
 }
@@ -57,21 +55,22 @@ class XMLOutput implements FormatInterface
 class CSVOutput implements FormatInterface
 {
     public function start() {
-        echo '<br><br>++CSVOutput OUTPUT START() <br>';
+        header("Content-type: text");
+        header("Content-Disposition: attachment; filename=file.csv");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+        echo "sku,name,short_description,price\r\n";
     }
 
     public function formatProduct(array $product) {
-        echo '<br><br>++CSVOutput OUTPUT FORMAT-PRODUCT() <br>';
-        echo ($product);
+        $conversion = new Conversions();  
+        echo $conversion->toCSV($product);
     }
 
     public function finish() {
-        echo '<br><br>++JCSVOutput OUTPUT FINISH() <br>';
-
 
     }
 }
-
 
 /*
 ** This is Strategic client code
@@ -84,10 +83,7 @@ class ProductOutput
 
     public function setProducts(array $products)
     {
-        //echo '**** setProducts';
-        //var_dump($products);
         $this->products = $products;
-        //var_dump($this->products);
     }
 
     public function setFormat(FormatInterface $format)
@@ -98,11 +94,11 @@ class ProductOutput
     public function format()
     {
         echo $this->format->start();
-        // foreach ($this->products as $product) {
-        //     echo $this->format->formatProduct($product);
-        // }
+         foreach ($this->products as $product) {
+             echo $this->format->formatProduct($product);
+         }
 
-        echo $this->format->formatProduct($this->products);
+        //echo $this->format->formatProduct($this->products);
 
         echo $this->format->finish();
     }
