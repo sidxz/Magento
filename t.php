@@ -69,11 +69,7 @@ function array2xml($array, $wrap='ROW0', $upper=true) {
 
 function toCSV($array) {
 
-		$csv='';
-	foreach ($array as $key=>$value) {
-		$csv .= $key . ',';
-	}
-	//$csv = rtrim($csv, ",");
+	$csv='';
 	csv .= '\n';
 	foreach ($array as $key=>$value) {
 		$csv .= $value . ',';

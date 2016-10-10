@@ -36,20 +36,31 @@ $formatKey = 'json'; // I should be able to change this to csv, xml, or json to 
 
 // Logic for gathering product data goes here
 
-// Connect to SOAP API using PHP's SoapClient class
-// Feel free to create your own classes to simplify multiple API calls
+/*
+* Connect to SOAP API using PHP's SoapClient class
+*/
+
 $client = new SoapClient($apiUrl);
 #var_dump($client->__getFunctions()); 
 #var_dump($client->__getTypes()); 
 $session = $client->login($apiUser, $apiKey);
+
+/*
+* !CAUTION! As per the api doc, while given an array input, it should return an array of outputs
+* However, it is observed that, the api is always returning the results of the first element
+* of the array.
+* To simulate the behaviour, we are quering thrice and then joining them into an array 
+*/
+
 //$list = array ('1','2','3');
 $result1 = $client->call($session, 'catalog_product.info', 1);
 $result2 = $client->call($session, 'catalog_product.info', 2);
 $result3 = $client->call($session, 'catalog_product.info', 3);
 
-
-//$results = array ($result1);
-
+/*
+* We are using this api filter to filter out the required columns from 
+* the array returned by the api
+*/
 function apiFilter(array $result) {
 	$temp = array();
 	foreach ($result as $key=>$value) {
@@ -65,34 +76,47 @@ return $temp;
  $result2 = apiFilter($result2);
  $result3 = apiFilter($result3);
 
- //var_dump(result1);
+/*
+* Joining back the filtered array.
+*/
 $results = array ($result1 ,$result2 ,$result3);
-
 //var_dump($results);
+
+/*
+* We have got ur data and so we dont need to keep the api open.
+* Lets terminate the session.
+*/
 $client->endSession($session);
-
-
-//var_dump($result);
-#echo json_encode($result)
-// ...
-// ...
 
 // Output logic goes here, most will be encapsulated in your classes
 // View ProductOutput in raz-lib.php for help on what else goes here
 
 $factory = new FormatFactory(); // You will need to create this class. Be sure to use constants for the format keys!
 
+/*
+* This calls the factory class.
+* This will return a object of type JsonStringOutput or XMLOutput or CSVOutput 
+*/
 $format = $factory->create($formatKey);
 
-//$output = new ProductOutput();
-// ...
-// ...
-//$output->format();
-
+/*
+* Creates an object of the strategy pattern's client
+*/
 $client = new ProductOutput();
+
+/*
+* We pass in the format object as returned by the factory method
+*/
 $client->setFormat($format);
-//$client->setFormat(new XMLOutput());
+
+/*
+* We pass in the result array that we obtained from the API calls post filter
+*/
 $client->setProducts($results);
+
+/*
+* This does our job of formatting.
+*/
 $client->format();
 
 ?>

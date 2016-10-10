@@ -3,8 +3,17 @@
 class Conversions
 {
 	
-	function toCSV($array) {
 
+/*
+* Note we are sending hearders in the begin() function and not here
+* The API used in magento store does not return nested arrays.
+* Iterating over the returned array once will do the job 
+*/
+
+/*
+* Helper function to convert array to CSV
+*/
+function toCSV($array) {
 	$csv='';
 	foreach ($array as $key=>$value) {
 		$csv .= $value . ",";
@@ -13,10 +22,15 @@ class Conversions
 	$csv .= $csv . "\r\n";
 	return $csv;
 
-	}
+}
 
-
-
+/*
+* Helper function to convert array to JSON
+* I am reusing a standard function for json. This supports for nested arrays,
+* which is an added functionality (Though Maganto API will not need it)
+* Reference : PHP json_encode manual implementation for php < 4.0 
+* http://php.net/manual/en/function.json-encode.php
+*/
 function toJSON($arr) { 
     $parts = array(); 
     $is_list = false; 
@@ -48,7 +62,6 @@ function toJSON($arr) {
             //elseif($value === true) $str .= 'true'; 
             //else
              $str .= '"' . addslashes($value) . '"'; //All other things 
-            // :TODO: Is there any more datatype we should be in the lookout for? (Object?) 
 
             $parts[] = $str; 
         } 
@@ -60,6 +73,9 @@ function toJSON($arr) {
 
 }
 
+/*
+* Helper function to convert array into XML Document
+*/
 
 function toXML($array, $wrap="DATA", $upper=true) {
 	
