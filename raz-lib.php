@@ -1,5 +1,6 @@
 <?php
 require_once 'conversions.php';
+
 /*************************
 ** Strategy Design Pattern
 **************************/
@@ -15,15 +16,16 @@ interface FormatInterface
 
 
 class JsonStringOutput implements FormatInterface
-{
+{   
+   /*
+    *  All json objects start with [
+    */
     public function start() {
         echo '[';
     }
 
     public function formatProduct(array $product) {
-        //echo json_encode($product);
         $conversion = new Conversions();
-        //echo "<br>";        
         echo $conversion->toJSON($product);
     }
 
@@ -34,6 +36,11 @@ class JsonStringOutput implements FormatInterface
 
 class XMLOutput implements FormatInterface
 {
+    /*
+    * It's important to pass proper header information for XML Documents
+    * The best way is to pass them in the start(), as this is the first thing
+    * that will be executed by the script.
+    */
     public function start() {
         header("Content-type: text/xml; charset=utf-8");
         echo "<XML>";
@@ -54,6 +61,12 @@ class XMLOutput implements FormatInterface
 
 class CSVOutput implements FormatInterface
 {
+    /*
+    * Pass CSS Headers, Browsers like chrome and firefox will identify this and start a file 
+    * download.
+    * We are also setting the first row of the csv file here, as specified in the problem
+    * statement.
+    */
     public function start() {
         header("Content-type: text");
         header("Content-Disposition: attachment; filename=file.csv");
@@ -78,7 +91,13 @@ class CSVOutput implements FormatInterface
 class ProductOutput
 {
     protected $products = array();
-    
+    /*
+    * The $format is of type FormatInterface. Remember the Format interface is implemented by 
+    * JsonStringOutput, XMLOutput and CSVOutput. So $fomat will hold an object belonging to either 
+    * of the three classes. 
+    * The format() then reffers to this object using $this->format->formatProduct(...)
+    * $this->format is the object of the above type, e.g jsonStribgOutputObj->formatProduct(...)
+    */ 
     protected $format;
 
     public function setProducts(array $products)
@@ -97,9 +116,6 @@ class ProductOutput
          foreach ($this->products as $product) {
              echo $this->format->formatProduct($product);
          }
-
-        //echo $this->format->formatProduct($this->products);
-
         echo $this->format->finish();
     }
 
