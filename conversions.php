@@ -16,10 +16,10 @@ class Conversions
 function toCSV($array) {
 	$csv='';
 	foreach ($array as $key=>$value) {
-		$csv .= $value . ",";
+		$csv .= str_replace(',',' ',$value). ",";
 	}
 	$csv = rtrim($csv, ",");
-	$csv .= $csv . "\r\n";
+	$csv = $csv . "\r\n";
 	return $csv;
 
 }

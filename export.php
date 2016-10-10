@@ -32,7 +32,7 @@ require_once 'dev-lib.php';
 $apiUrl = 'http://www.wellpennedgreetings.com/api/?wsdl';
 $apiUser = 'dev-test';
 $apiKey = 'SsdqpVN7wNdAmj';
-$formatKey = 'json'; // I should be able to change this to csv, xml, or json to adjust outputted format
+$formatKey = 'csv'; // I should be able to change this to csv, xml, or json to adjust outputted format
 
 // Logic for gathering product data goes here
 
